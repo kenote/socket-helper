@@ -1,0 +1,33 @@
+{
+  "name": "kenote-socket-helper",
+  "version": "1.0.0",
+  "description": "Socket's Helper.",
+  "main": "./dist/index.js",
+  "typings": "./src/index.d.ts",
+  "repository": "https://github.com/kenote/socket-helper.git",
+  "author": "thondery <thondery@163.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^5.0.5",
+    "@types/node": "^11.13.4",
+    "typescript": "^3.4.3"
+  },
+  "dependencies": {
+    "fs-extra": "^7.0.1",
+    "protobufjs": "^6.8.8",
+    "python-struct": "^1.0.6"
+  },
+  "engines": {
+    "node": ">8.0.0"
+  },
+  "keywords": [
+    "socket",
+    "protobuf",
+    "helper",
+    "assistant",
+    "typescript"
+  ]
+}
