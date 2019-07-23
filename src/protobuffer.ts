@@ -1,20 +1,24 @@
 import * as path from 'path'
 import * as protobuf from 'protobufjs'
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 import * as zlib from 'zlib'
 import * as struct from 'python-struct'
-import { PBSetting, ProtoBuffer, PB } from './index.d'
+import { PBSetting, ProtoBuffer, PB } from '../types'
 
-export default class protobuffer {
+export default class Protobuffer {
 
   private __setting: PBSetting
   private __ProtoBuffer: ProtoBuffer
   private __Root: Map<any, any>
   private __game: string
+  private __CMsgBase: string
+  private __CMsgHead: string
 
   constructor (setting: PBSetting) {
     this.__setting = setting
     this.__game = setting.game || 'game'
+    this.__CMsgBase = setting.CMsgBase || 'CMsgBase'
+    this.__CMsgHead = setting.CMsgHead || 'CMsgHead'
     this.__ProtoBuffer = this.getProtoBuffer(setting)
     let { socketRoot, GMRoot } = this.__ProtoBuffer
     this.__Root = new Map()
@@ -22,18 +26,18 @@ export default class protobuffer {
     this.__Root.set('game', GMRoot)
   }
 
-  gameMessage = (name: string): protobuf.ReflectionObject | null | undefined => {
+  public gameMessage = (name: string): protobuf.ReflectionObject | null | undefined => {
     let { GMRoot } = this.__ProtoBuffer
     return GMRoot && GMRoot.root.lookup(`${this.__setting.prefix}.${this.__game}.${name}`)
   }
 
-  makeData = (buffer: zlib.InputType): Buffer => {
+  public makeData = (buffer: zlib.InputType): Buffer => {
     let zlibBuffer: Buffer = compressData(buffer)
     let head: Buffer = struct.pack('!i', zlibBuffer.length)
     return Buffer.concat([head, zlibBuffer])
   }
 
-  decode = (buffer: zlib.InputType, CMsg: protobuf.ReflectionObject): PB.Message | Buffer => {
+  public decode = (buffer: zlib.InputType, CMsg: protobuf.ReflectionObject): PB.Message | Buffer => {
     let { CMsgBase } = this.__ProtoBuffer
     let ungzipBuffer: Buffer = decompressData(buffer)
     let message: PB.Message = CMsgBase && (<any> CMsgBase).decode(ungzipBuffer)
@@ -45,7 +49,7 @@ export default class protobuffer {
     return ungzipBuffer
   }
 
-  createPBBuffer = (msgtype: number, csMsg: string, params: any): zlib.InputType => {
+  public createPBBuffer = (msgtype: number, csMsg: string, params: any): zlib.InputType => {
     let { CMsgBase } = this.__ProtoBuffer
     let msghead: protobuf.Message<object> = this.createHeadMessage(msgtype)
     let pbRealHead: protobuf.Message<object> = (<any> CMsgBase).create({ msghead })
@@ -69,8 +73,8 @@ export default class protobuffer {
     let GMRoot: protobuf.Root | undefined
     if (fs.existsSync(socketPB)) {
       socketRoot = protobuf.loadSync(socketPB)
-      CMsgBase = socketRoot.root.lookup(`${setting.prefix}.socket.CMsgBase`)
-      CMsgHead = socketRoot.root.lookup(`${setting.prefix}.socket.CMsgHead`)
+      CMsgBase = socketRoot.root.lookup(`${setting.prefix}.socket.${this.__CMsgBase}`)
+      CMsgHead = socketRoot.root.lookup(`${setting.prefix}.socket.${this.__CMsgHead}`)
     }
     let gmPB: string = path.resolve(pbDir, setting.gmPB)
     if (fs.existsSync(gmPB)) {

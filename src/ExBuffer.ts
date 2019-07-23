@@ -1,4 +1,3 @@
-
 export default class ExBuffer {
 
   private _headLen: number = 2
@@ -16,49 +15,49 @@ export default class ExBuffer {
     this._buffer = new Buffer(bufferLength || 8192)
   }
 
-  uint32Head (): this {
+  public uint32Head (): this {
     this._headLen = 4
-    this._readMethod = 'readUInt' + (8*this._headLen) + ''+ this._endian +'E'
+    this._readMethod = 'readUInt' + (8 * this._headLen) + '' + this._endian + 'E'
     return this
   }
 
-  ushortHead (): this {
+  public ushortHead (): this {
     this._headLen = 2
-    this._readMethod = 'readUInt' + (8*this._headLen) + ''+ this._endian +'E'
+    this._readMethod = 'readUInt' + (8 * this._headLen) + '' + this._endian + 'E'
     return this
   }
 
-  littleEndian (): this {
+  public littleEndian (): this {
     this._endian = 'L'
-    this._readMethod = 'readUInt' + (8*this._headLen) + ''+ this._endian +'E'
+    this._readMethod = 'readUInt' + (8 * this._headLen) + '' + this._endian + 'E'
     return this
   }
 
-  bigEndian (): this {
+  public bigEndian (): this {
     this._endian = 'B'
-    this._readMethod = 'readUInt' + (8*this._headLen) + ''+ this._endian +'E'
+    this._readMethod = 'readUInt' + (8 * this._headLen) + '' + this._endian + 'E'
     return this
   }
 
-  once (e: any, cb: any): void {
+  public once (e: any, cb: any): void {
     if (!this.listeners_once) this.listeners_once = {}
     this.listeners_once[e] = this.listeners_once[e] || []
     if (this.listeners_once[e].indexOf(cb) == -1) this.listeners_once[e].push(cb)
   }
 
-  on (e: any, cb: any): void {
+  public on (e: any, cb: any): void {
     if (!this.listeners) this.listeners = {}
     this.listeners[e] = this.listeners[e] || []
     if (this.listeners[e].indexOf(cb) == -1) this.listeners[e].push(cb)
   }
 
-  off (e: any, cb: any): void {
+  public off (e: any, cb: any): void {
     let index: number = -1
     if (this.listeners && this.listeners[e] && (index = this.listeners[e].indexOf(cb)) != -1)
       this.listeners[e].splice(index)
   }
 
-  emit (e: any, ...args: any[]): void {
+  public emit (e: any, ...args: any[]): void {
     let other_parameters: any = this.slice.call(arguments, 1)
     if (this.listeners) {
       let list: any = this.listeners[e]
@@ -79,22 +78,22 @@ export default class ExBuffer {
     }
   }
 
-  put (buffer: Buffer, offset?: number, len?: number): void {
+  public put (buffer: Buffer, offset?: number, len?: number): void {
     if (offset == undefined) offset = 0
     if (len == undefined) len = buffer.length - offset
 
     if (len + this.getLen() > this._buffer.length - 1) {
-      let ex:number = Math.ceil((len + this.getLen())/(1024))
+      let ex: number = Math.ceil((len + this.getLen()) / (1024))
       let tmp: Buffer = new Buffer(ex * 1024)
       let exlen: number = tmp.length - this._buffer.length
       this._buffer.copy(tmp)
-      //fix bug : superzheng
+      // fix bug : superzheng
       if (this._putOffset < this._readOffset) {
         if (this._putOffset <= exlen) {
           tmp.copy(tmp, this._buffer.length, 0, this._putOffset)
           this._putOffset += this._buffer.length
         } else {
-          //fix bug : superzheng
+          // fix bug : superzheng
           tmp.copy(tmp, this._buffer.length, 0, exlen)
           tmp.copy(tmp, 0, exlen, this._putOffset)
           this._putOffset -= exlen
@@ -106,7 +105,7 @@ export default class ExBuffer {
       this._putOffset = this._readOffset = 0
     }
     if ((this._putOffset + len) > this._buffer.length) {
-        //分两次存 一部分存在数据后面 一部分存在数据前面
+        // 分两次存 一部分存在数据后面 一部分存在数据前面
         let len1: number = this._buffer.length - this._putOffset
         if (len1 > 0) {
           buffer.copy(this._buffer, this._putOffset, offset, offset + len1)
@@ -125,10 +124,10 @@ export default class ExBuffer {
     let count: number = 0
     while (true) {
       count++
-      if (count > 1000) break //1000次还没读完??
+      if (count > 1000) break // 1000次还没读完??
       if (this._dlen == 0) {
         if (this.getLen() < this._headLen) {
-          break //连包头都读不了
+          break // 连包头都读不了
         }
         if (this._buffer.length - this._readOffset >= this._headLen) {
           this._dlen = this._buffer[this._readMethod](this._readOffset)
@@ -143,7 +142,7 @@ export default class ExBuffer {
           }
           this._readOffset = 0
           for (let i: number = 0; i < (this._headLen - rlen); i++) {
-              hbuf[rlen+i] = this._buffer[this._readOffset++]
+              hbuf[rlen + i] = this._buffer[this._readOffset++]
           }
           this._dlen = hbuf[this._readMethod](0)
         }
@@ -165,12 +164,12 @@ export default class ExBuffer {
         }
         try {
           this._dlen = 0
-          this.emit("data", dbuff)
+          this.emit('data', dbuff)
           if (this._readOffset === this._putOffset) {
             break
           }
-        } catch(e) {
-          this.emit("error", e)
+        } catch (error) {
+          this.emit('error', error)
         }
       }
       else {
@@ -179,7 +178,7 @@ export default class ExBuffer {
     }
   }
 
-  getLen (): number {
+  private getLen (): number {
     if (this._putOffset >= this._readOffset) {
       return this._putOffset -  this._readOffset
     }

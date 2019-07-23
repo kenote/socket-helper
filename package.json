@@ -1,24 +1,24 @@
 {
   "name": "kenote-socket-helper",
-  "version": "1.0.0",
-  "description": "Socket's Helper.",
-  "main": "./dist/index.js",
-  "typings": "./src/index.d.ts",
+  "version": "1.1.0",
+  "description": "Send Protocol Buffers data with socket's helper.",
+  "main": "dist/index.js",
+  "typings": "types/index.d.ts",
   "repository": "https://github.com/kenote/socket-helper.git",
   "author": "thondery <thondery@163.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "rm -rf ./dist && tsc",
+    "postinstall": "npm run build"
   },
   "devDependencies": {
-    "@types/fs-extra": "^5.0.5",
-    "@types/node": "^11.13.4",
-    "typescript": "^3.4.3"
+    "@types/node": "^12.6.8",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
   },
   "dependencies": {
-    "fs-extra": "^7.0.1",
     "protobufjs": "^6.8.8",
-    "python-struct": "^1.0.6"
+    "python-struct": "^1.0.8"
   },
   "engines": {
     "node": ">8.0.0"

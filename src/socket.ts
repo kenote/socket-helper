@@ -12,7 +12,7 @@ export default class Socket {
     if (Port) this.__Href.port = <string> Port
   }
 
-  send (data: string | Buffer | Uint8Array): Promise<Buffer> {
+  public send (data: string | Buffer | Uint8Array): Promise<Buffer> {
     let { hostname, port } = this.__Href
     let socket: net.Socket = new net.Socket()
     let exBuffer: ExBuffer = new ExBuffer().uint32Head().bigEndian()
