@@ -8,8 +8,8 @@ export default class ExBuffer {
   private _dlen: number = 0
   private slice: (start?: number | undefined, end?: number | undefined) => any[] = Array.prototype.slice
   private _readMethod: string = 'readUInt16BE'
-  private listeners: {}
-  private listeners_once: {}
+  private listeners?: Record<string, any>
+  private listeners_once?: Record<string, any>
 
   constructor (bufferLength?: number) {
     this._buffer = new Buffer(bufferLength || 8192)
